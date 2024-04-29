@@ -1,12 +1,13 @@
 package main
 
-import "fmt"
-
 func main() {
 	bc := NewBlockChain()
-	fmt.Println(bc)
+	bc.Print()
+	bc.AddTransaction("A", "B", 1.0)
 	bc.CreateBlock(5, bc.LastBlock().Hash())
 	bc.Print()
+	bc.AddTransaction("C", "D", 2.0)
+	bc.AddTransaction("X", "Y", 3.001)
 	bc.CreateBlock(10, bc.LastBlock().Hash())
 	bc.Print()
 

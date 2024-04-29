@@ -82,3 +82,8 @@ func (bc *BlockChain) Print() {
 func (bc *BlockChain) LastBlock() *Block {
 	return bc.chain[len(bc.chain)-1]
 }
+
+func (bc *BlockChain) AddTransaction(sender, recipient string, value float32) {
+	t := NewTransaction(sender, recipient, value)
+	bc.transactionPool = append(bc.transactionPool, t)
+}
