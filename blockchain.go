@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const MINIMUM_DIFFICULTY = 3
+
 type Block struct {
 	nonce        int
 	previousHash [32]byte
@@ -33,6 +35,35 @@ func (bc *BlockChain) CreateBlock(nonce int, previousHash [32]byte) *Block {
 	bc.transactionPool = []*Transaction{}
 
 	return b
+}
+
+func (bc *BlockChain) CopyTransactionPool() []*Transaction {
+	transactions := make([]*Transaction, len(bc.transactionPool))
+	for i := 0; i < len(bc.transactionPool); i++ {
+		transactions[i] = NewTransaction(bc.transactionPool[i].senderBlockchainAddress, bc.transactionPool[i].recipientBlockchainAddress, bc.transactionPool[i].value)
+	}
+
+	return transactions
+}
+
+func (bc *BlockChain) ValidProof(nonce int, previousHash [32]byte, transactions []*Transaction, difficulty int) bool {
+	zerosString := strings.Repeat("0", difficulty)
+	guessblock := Block{nonce, previousHash, 0, transactions}
+	guessHashStr := fmt.Sprintf("%x", guessblock.Hash())
+
+	return guessHashStr[:difficulty] == zerosString
+}
+
+func (bc *BlockChain) ProofOfWork() int {
+	transactions := bc.CopyTransactionPool()
+	previousHash := bc.LastBlock().Hash()
+	nonce := 0
+
+	for !bc.ValidProof(nonce, previousHash, transactions, MINIMUM_DIFFICULTY) {
+		nonce += 1
+	}
+
+	return nonce
 }
 
 func NewBlock(nonce int, previousHash [32]byte, transactions []*Transaction) *Block {
@@ -66,7 +97,7 @@ func (b *Block) MarshalJSON() ([]byte, error) {
 
 func (b *Block) Hash() [32]byte {
 	m, _ := json.Marshal(b)
-	fmt.Println(string(m))
+	// fmt.Println(string(m))
 	return sha256.Sum256([]byte(m))
 }
 
