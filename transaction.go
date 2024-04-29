@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"k8s.io/apimachinery/pkg/util/json"
 )
 
 type Transaction struct {
