@@ -1,18 +1,17 @@
 package main
 
 func main() {
-	bc := NewBlockChain()
+	myBlockChainAddress := "my-blockchain_address"
+	bc := NewBlockChain(myBlockChainAddress)
 	bc.Print()
+
 	bc.AddTransaction("A", "B", 1.0)
-	previousHash := bc.LastBlock().Hash()
-	nonce := bc.ProofOfWork()
-	bc.CreateBlock(nonce, previousHash)
+	bc.Mining()
 	bc.Print()
+
 	bc.AddTransaction("C", "D", 2.0)
 	bc.AddTransaction("X", "Y", 3.001)
-	previousHash = bc.LastBlock().Hash()
-	nonce = bc.ProofOfWork()
-	bc.CreateBlock(nonce, previousHash)
+	bc.Mining()
 	bc.Print()
 
 	// b := &Block{nonce: 1}

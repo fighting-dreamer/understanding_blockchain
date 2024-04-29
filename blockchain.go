@@ -4,11 +4,14 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
 
 const MINIMUM_DIFFICULTY = 3
+const MINING_SENDER = "THE BLOCKCHAIN"
+const MINING_REWARD = 1.0
 
 type Block struct {
 	nonce        int
@@ -18,13 +21,15 @@ type Block struct {
 }
 
 type BlockChain struct {
-	transactionPool []*Transaction
-	chain           []*Block
+	transactionPool   []*Transaction
+	chain             []*Block
+	blockChainAddress string
 }
 
-func NewBlockChain() *BlockChain {
+func NewBlockChain(address string) *BlockChain {
 	b := &Block{}
 	bc := new(BlockChain)
+	bc.blockChainAddress = address
 	bc.CreateBlock(0, b.Hash())
 	return bc
 }
@@ -64,6 +69,15 @@ func (bc *BlockChain) ProofOfWork() int {
 	}
 
 	return nonce
+}
+
+func (bc *BlockChain) Mining() bool {
+	bc.AddTransaction(MINING_SENDER, bc.blockChainAddress, MINING_REWARD)
+	nonce := bc.ProofOfWork()
+	previousHash := bc.LastBlock().Hash()
+	bc.CreateBlock(nonce, previousHash)
+	log.Println("action=mining, status=success")
+	return true
 }
 
 func NewBlock(nonce int, previousHash [32]byte, transactions []*Transaction) *Block {
